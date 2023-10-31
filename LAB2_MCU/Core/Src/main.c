@@ -159,56 +159,14 @@ void display7SEG(int num)
 		HAL_GPIO_WritePin(GPIOB, SEG6_Pin, 1);
 	}
 }
-const int MAX_LED = 4;
-int index_led = 0;
 int led_buffer [4] = {1,5,1,7};
-void update7SEG ( int index )
+void updateClockBuffer (int minute, int hour)
 {
-	switch ( index )
-	{
-		case 0:
-			// Display the first 7 SEG with led_buffer [0]
-			display7SEG(led_buffer[index]);
-			HAL_GPIO_WritePin(GPIOA,EN0_Pin,0);
-			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
-		break ;
-		case 1:
-			// Display the second 7 SEG with led_buffer [1]
-			display7SEG(led_buffer[index]);
-			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN1_Pin,0);
-			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
-		break ;
-		case 2:
-			// Display the third 7 SEG with led_buffer [2]
-			display7SEG(led_buffer[index]);
-			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN2_Pin,0);
-			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
-		break ;
-		case 3:
-			// Display the forth 7 SEG with led_buffer [3]
-			display7SEG(led_buffer[index]);
-			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
-			HAL_GPIO_WritePin(GPIOA,EN3_Pin,0);
-		break ;
-		default :
-		break ;
-	}
+	 led_buffer[0] = hour/10;
+	 led_buffer[1] = hour%10;
+	 led_buffer[2] = minute/10;
+	 led_buffer[3] = minute%10;
 }
- void updateClockBuffer (int minute, int hour)
- {
-		 led_buffer[0] = hour/10;
-		 led_buffer[1] = hour%10;
-		 led_buffer[2] = minute/10;
-		 led_buffer[3] = minute%10;
- }
 /* USER CODE END 0 */
 
 /**
@@ -247,35 +205,76 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   int hour = 15, minute = 17, second = 50;
+  int index = 0;
   setTimer1(250);
   setTimer2(1000);
   while (1)
   {
     /* USER CODE END WHILE */
-	  if(timer1_flag == 1)
-	  	  {
-	  		  update7SEG (index_led++);
-	  		  if(index_led >= 4) index_led = 0;
-	  		  setTimer1(250);
-	  	  }
-	  if(timer2_flag == 1)
-	  	  {
+	if(timer1_flag == 1)
+	{
+		switch ( index )
+		{
+		  		case 0:
+		  			// Display the first 7 SEG with led_buffer [0]
+		  			display7SEG(led_buffer[index]);
+		  			HAL_GPIO_WritePin(GPIOA,EN0_Pin,0);
+		  			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
+		  		break ;
+		  		case 1:
+		  			// Display the second 7 SEG with led_buffer [1]
+		  			display7SEG(led_buffer[index]);
+		  			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN1_Pin,0);
+		  			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
+		  		break ;
+		  		case 2:
+		  			// Display the third 7 SEG with led_buffer [2]
+		  			display7SEG(led_buffer[index]);
+		  			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN2_Pin,0);
+		  			HAL_GPIO_WritePin(GPIOA,EN3_Pin,1);
+		  		break ;
+		  		case 3:
+		  			// Display the forth 7 SEG with led_buffer [3]
+		  			display7SEG(led_buffer[index]);
+		  			HAL_GPIO_WritePin(GPIOA,EN0_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN1_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN2_Pin,1);
+		  			HAL_GPIO_WritePin(GPIOA,EN3_Pin,0);
+		  		break ;
+		  		default :
+		  		break ;
+		}
+		index++;
+	  	if(index >= 4) index = 0;
+	  	setTimer1(250);
+	 }
+	 if(timer2_flag == 1)
+	 {
 	  		  second ++;
-	  		  if ( second >= 60) {
-	  		  second = 0;
-	  		   minute ++;
+	  		  if ( second >= 60)
+	  		  {
+	  			  second = 0;
+	  			  minute ++;
 	  		  }
-	  		  if( minute >= 60) {
-	  		  minute = 0;
-	  		  hour ++;
+	  		  if( minute >= 60)
+	  		  {
+	  			  minute = 0;
+	  			  hour ++;
 	  		  }
-	  		  if( hour >=24){
-	  		   hour = 0;
-	  		   }
-	  		  updateClockBuffer(minute, hour);
+	  		  if( hour >=24)
+	  		  {
+	  			  hour = 0;
+	  		  }
+	  		  updateClockBuffer ( minute, hour);
 	  		  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 	  		  setTimer2(1000);
-	  	  }
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
